@@ -96,17 +96,17 @@ show_pages(
         Section(name='Policy and Operations'),
 
         Page('menu_pages/dashboard.py', 'Dashboard', '📊', in_section=True),
-        Page('menu_pages/geo.py', ' Geomapping', '🗺️'),
+        Page('menu_pages/geo.py', 'Geomapping', '🗺️'),
 
-        Section(name='Smart Analytics'),
+        Section(name='Smart Predict'),
 
-        Page('menu_pages/predict.py', ' Predict', '🤖'),
-        Page('menu_pages/prevent.py', ' Prevent', '🔎'),
+        Page('menu_pages/ml.py', 'Diabetes', '💉'),
+        Page('menu_pages/simulate.py', 'Simulation', '🖥️'),
 
-        Section(name='Inform'),
+        Section(name='Smart Prevent'),
 
-        Page('menu_pages/sms.py', ' SMS', '📶'),
-        Page('menu_pages/post.py', '    Announcements', '📲'),
-        Page('menu_pages/about.py', '   About', '💡'),
+        Page('menu_pages/sms.py', 'SMS', '📶'),
+        Page('menu_pages/post.py', 'Announcements', '📲'),
+        Page('menu_pages/about.py', 'About', '💡'),
     ]
 )
