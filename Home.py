@@ -22,9 +22,11 @@ conn = st.connection("user", type=GSheetsConnection)
 placeholder = st.empty()
 
 # Title
-# st.image('images/logo.png', width=150) 
-add_vertical_space(1)
-st.caption('🧑‍⚕️ PULSO | Predictive Understanding for Localized Health Surveillance and Optimization')
+col1, col2 = st.columns(2)
+with col1:
+    st.image('images/logo.png', width=50) 
+with col2:
+    st.caption('🧑‍⚕️ PULSO | Predictive Understanding for Localized Health Surveillance and Optimization')
 
 add_vertical_space(1)
 login_placeholder = st.empty()
