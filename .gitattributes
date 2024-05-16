@@ -1,1 +1,2 @@
 datasets/phl_adminboundaries_candidate_adm3/phl_admbnda_adm3_psa_namria_20200529.shp filter=lfs diff=lfs merge=lfs -text
+.*shp filter=lfs diff=lfs merge=lfs -text
