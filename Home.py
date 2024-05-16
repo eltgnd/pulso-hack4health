@@ -1,7 +1,7 @@
 import streamlit as st
 from streamlit_extras.add_vertical_space import add_vertical_space
 from streamlit_gsheets import GSheetsConnection
-from st_pages import Page, Section,show_pages, add_page_title
+from st_pages import *
 from streamlit_extras.metric_cards import style_metric_cards
 from streamlit_image_select import image_select
 import datetime
@@ -94,9 +94,10 @@ st.markdown(f"""
 )
 
 # Welcome
+hide_pages(['Home.py'])
 show_pages(
     [
-        Page('Home.py', 'Homepage', '👤'),
+        # Page('Home.py222222', 'Homepage', '👤'),
 
         Section(name='PULSO Track'),
 
@@ -131,21 +132,7 @@ with col2:
         section_text = ''
         st.markdown("The web app will be used as a tool to help government decision-making concerned with rapid intervention, policies, and programs on public health. By focusing on community-level health monitoring, the app aims to improve healthcare outcomes and address specific health needs of Filipino populations across both urban and rural areas.")
 
-# Impact
-st.caption('IMPACT BY NUMBERS')
-col1, col2, col3 = st.columns(3)
-row1= [col1, col2, col3]
-homepage_impact = {
-    0 : ['Updated EMRs', '2748', 1406],
-    1 : ['Lorem Ipsum', '376', 8],
-    2 : ['Active Health Facilities', '49', 16]
-
-}
-for ind, col in enumerate(row1):
-    col.metric(label=homepage_impact[ind][0], value=homepage_impact[ind][1], delta=homepage_impact[ind][2])
-
-style_metric_cards(border_left_color='#B23939', border_radius_px=7, box_shadow=False)
-
 st.divider()
 
-# Features Overview
+with st.container(border=True):
+    st.write('💡 Begin utilizing PULSO by visiting its tools under PULSO Track, PULSO Predict, and PULSO Prevent.')

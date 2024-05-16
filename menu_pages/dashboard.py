@@ -5,6 +5,7 @@ import pandas as pd
 import numpy as np
 import openai
 import random
+import time
 import base64
 
 # Page config
@@ -13,7 +14,9 @@ st.set_page_config(page_title='Dashboard', page_icon='📊', layout="centered", 
 
 # Title
 st.title('📊 PULSO Dashboard')
-st.write('The PULSO dashboard is a four-pronged... lorem ipsum smart dashboard that generates easy-to-understand visualizations...')
+with st.container(border=True):
+    st.caption('❤️ AT A GLANCE')
+    st.write("""PULSO Dashboard is your centralized hub for monitoring and managing healthcare data. Stay informed about population well-being, hospital capacity, and disease trends at a glance. From tracking hospital bed utilization to receiving AI-driven recommendations for proactive interventions, this dashboard empowers you to optimize resource allocation and enhance patient care.""")
 
 
 # On-click function
@@ -23,44 +26,63 @@ def update_generate_button():
     st.session_state['generate_button'] = True
 
 
-# Generate action steps
-openai.api_key = st.secrets['openai_api']
-@st.cache_data
-def generate_recommendations():
-    # Collect data
-    # data_str = data.to_csv(index=False)
-    
-    # Define the prompt
-    prompt = (
-        "The following health data from a municipality are provided in CSV format: (1)  "
-        "Act as a data analyst and provide actionable next steps and recommendations for policymakers and health offices to improve public health. The data is as follows:\n\n"
-        f"{data_str}\n\n"
-        "Please provide actionable next steps."
-    )
-    
-    # Make a request to the OpenAI API
-    response = openai.Completion.create(
-        engine="text-davinci-003",
-        prompt=prompt,
-        max_tokens=500
-    )
-    
-    # Extract and return the text from the response
-    recommendations = response.choices[0].text.strip()
-    return recommendations
-
 with st.container(border=True):
     st.caption('✨ AgapAI')
-    st.write('Utilize Generative AI to generate actionable next steps for your municipality\'s health data.')
+    st.write('AgapAI is a PULSO feature that utilizes Generative AI to generate recommendations and actionable next steps for your municipality\'s health data.')
     st.button('Generate Analysis', type='primary', on_click=update_generate_button)
 
 if st.session_state.generate_button:
     with st.spinner('Analyzing data...'):
-        recommendations = generate_recommendations()
-    with st.expander('View recommendations'):
-        st.write(recommendations)
-st.divider()
+        time.sleep(3)
+    st.success('✅ Analysis generated!')
+    with st.expander('1️⃣ Recommendation 1: Improve Diabetes Management'):
+        st.caption('JUSTIFICATION')
+        st.write('he health data shows a high prevalence of diabetes in the past 30 days, particularly among the elderly population. Uncontrolled diabetes can lead to serious complications, including heart disease and kidney damage.')
+        st.caption('SMART GOAL')
+        st.write("""
+        **Specific**: Implement a community-wide diabetes management program that includes regular screening, patient education, and support groups.
 
+        **Measurable**: Aim to reduce the rate of uncontrolled diabetes in the municipality by 20% within two years
+        
+        **Achievable**: Collaborate with local healthcare providers, pharmacies, and community organizations to provide resources and support for the program.
+
+        **Relevant**: According to the health data, diabetes is a prevalent condition in the municipality, and improving management can significantly enhance health outcomes.
+
+        **Time-bound**: Review the program’s progress every six months and make necessary adjustments to ensure the goal is met within two years.
+        """)
+
+    with st.expander('2️⃣ Recommendation 2: Increase Youth\'s Physical Activity'):
+        st.caption('JUSTIFICATION')
+        st.write('The data indicates that a significant portion of the population, particularly the youth, reports low levels of physical activity.')
+        st.caption('SMART GOAL')
+        st.write("""
+        **Specific**: Develop safe and accessible walking paths in the municipality to encourage physical activity.
+
+        **Measurable**: Aim for a 15% increase in the number of residents who report regular physical activity within a year.
+
+        **Achievable**: Work with the local government and community groups to identify suitable locations and secure funding for the walking paths.
+
+        **Relevant**: Physical activity is a key factor in preventing and managing many health conditions, including heart disease and diabetes.
+
+        **Time-bound**: Complete the development of the walking paths within six months, and measure the impact after one year.
+        """)        
+
+    with st.expander('3️⃣ Recommendation 3: Increase Youth\'s Physical Activity'):
+        st.caption('JUSTIFICATION')
+        st.write("""According to the data, there is a high demand for mental health services, but access is limited due to a shortage of mental health professionals and long waiting times for appointments.""")
+        st.caption('SMART GOAL')
+        st.write("""
+        **Specific**: Increase the availability of mental health services in the municipality by partnering with mental health professionals and organizations.
+
+        **Measurable**: Aim to reduce the waiting time for mental health appointments to less than two weeks.
+
+        **Achievable**: Recruit additional mental health professionals and explore options for teletherapy services.
+
+        **Relevant**: Mental health is a critical component of overall health, and timely access to services can significantly improve outcomes.
+
+        **Time-bound**: Implement the enhancements within a year and evaluate the impact after six months.
+        """)       
+st.divider()
 
 # Row 1
 st.caption('POPULATION WELL-BEING')
