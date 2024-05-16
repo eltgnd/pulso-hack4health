@@ -1,6 +1,10 @@
 import streamlit as st
 from streamlit_extras.metric_cards import style_metric_cards
+from streamlit_gsheets import GSheetsConnection
+import pandas as pd
+import numpy as np
 import openai
+import random
 
 # Page config
 st.set_page_config(page_title='Dashboard', page_icon='📊', layout="centered", initial_sidebar_state="auto", menu_items=None)
@@ -62,9 +66,9 @@ st.caption('POPULATION WELL-BEING')
 col1, col2, col3 = st.columns(3)
 row1= [col1, col2, col3]
 homepage_impact = {
-    0 : ['Updated EMRs', '2748', 1406],
-    1 : ['Lorem Ipsum', '376', 8],
-    2 : ['Active Health Facilities', '49', 16]
+    0 : ['Annual check-up population rate', '47%', 13],
+    1 : ['COVID-19 immunization rate', '53%', 8],
+    2 : ['Rate of patients at risk', '11%', 16]
 }
 for ind, col in enumerate(row1):
     col.metric(label=homepage_impact[ind][0], value=homepage_impact[ind][1], delta=homepage_impact[ind][2])
@@ -73,18 +77,46 @@ style_metric_cards(border_left_color='#B23939', border_radius_px=7, box_shadow=F
 
 # Row 2
 st.caption('HEALTH FACILITY STATUS')
-col1, col2 = st.columns([3,1])
+
+with st.container(border=True):
+    st.write(f'**Cumulative Bed Capacity of {st.session_state.municipality} over 30 days**')
+    chart_data = pd.DataFrame(np.random.random(30), columns=['Cumulative Bed Capacity Rate'])
+    st.line_chart(chart_data)
+
+conn = st.connection("beds", type=GSheetsConnection) # Google Sheets connection
+sql = 'SELECT * FROM Sheet1;'
+beds = conn.query(sql=sql, ttl=0)
+beds["trend"] = [[random.randint(0, 600) for _ in range(30)] for _ in range(len(beds))]
+
+with st.expander('View Table'):
+    st.dataframe(
+        beds,
+        column_config = {
+            "trend": st.column_config.LineChartColumn(
+                "Past 30-day Capacity", y_min=0, y_max=700
+            )
+        },
+        use_container_width=True
+    )
+
+col1, col2 = st.columns(2)
 with col1:
-    pass
-# get highest and lowest
-col2.metric(label='Highest Capacity', value=16, delta=4)
-col2.metric(label='Lowest Capacity', value=16, delta=4)
+    with st.container(border=True):
+        st.caption('📉 HIGHEST BED CAPACITY')
+        st.write('Lingayen Rural Health Unit II')
+with col2:
+    with st.container(border=True):
+        st.caption('📈 LOWEST BED CAPACITY')
+        st.write('Domalandan East Barangay Health Station')
+
 
 
 # Row 3
+st.write('\n')
 st.caption('NON-COMMUNICABLE DISEASE SITUATIONER')
 
 
 
 # Row 4
+st.write('\n')
 st.caption('COMMUNICABLE DISEASE SITUATIONER')
