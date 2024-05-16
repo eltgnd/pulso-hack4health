@@ -211,7 +211,7 @@ if submit_button:
     st.markdown(
         f'''
         <div style="display: flex; justify-content: center;">
-            <img src="data:image/gif;base64,{data_url}" alt="SIRV Simulation" style="width: 150%; height: auto;">
+            <img src="data:image/gif;base64,{data_url}" alt="SIRV Simulation" style="width: 110%; height: auto;">
         </div>
         ''',
         unsafe_allow_html=True,
@@ -241,7 +241,7 @@ else:
         st.markdown(
             f'''
             <div style="display: flex; justify-content: center;">
-                <img src="data:image/gif;base64,{data_url}" alt="SIRV Simulation" style="width: 150%; height: auto;">
+                <img src="data:image/gif;base64,{data_url}" alt="SIRV Simulation" style="width: 110%; height: auto;">
             </div>
             ''',
             unsafe_allow_html=True,
