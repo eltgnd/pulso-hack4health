@@ -106,14 +106,13 @@ show_pages(
 
         Section(name='PULSO Predict'),
 
-        Page('menu_pages/predict_disease.py', 'Disease Predict', '📊'),
+        Page('menu_pages/predict_disease.py', 'Disease Predict', '🔎'),
         Page('menu_pages/forecast.py', 'Forecast', '📉'),
         Page('menu_pages/simulate.py', 'Simulation', '🖥️'),
 
         Section(name='PULSO Prevent'),
 
         Page('menu_pages/sms.py', 'SMS', '📶'),
-        Page('menu_pages/post.py', 'Announcements', '📲'),
         Page('menu_pages/about.py', 'About', '💡'),
     ]
 )
