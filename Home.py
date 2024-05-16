@@ -3,7 +3,6 @@ from streamlit_extras.add_vertical_space import add_vertical_space
 from streamlit_gsheets import GSheetsConnection
 from st_pages import Page, Section,show_pages, add_page_title
 from streamlit_extras.metric_cards import style_metric_cards
-from streamlit_extras.metric_cards import style_metric_cards
 from streamlit_image_select import image_select
 import datetime
 from PIL import Image
@@ -88,7 +87,7 @@ placeholder.empty()
 st.markdown(f"""
     <div style="line-height:450%;">
         <span style=" font-size:60px ; color:#31333F ; font-weight:bold; ">Welcome, </span>
-        <span style=" font-size:60px ; color:#B23939 ; font-weight:bold; ">{st.session_state.name}</span>
+        <span style=" font-size:60px ; color:#31333F ; font-weight:regular; ">{st.session_state.name}</span>
         <span style=" font-size:60px ; color:#31333F ; font-weight:bold; ">👋</span>
     </div>""",
     unsafe_allow_html=True
@@ -99,18 +98,18 @@ show_pages(
     [
         Page('Home.py', 'Homepage', '👤'),
 
-        Section(name='Policy and Operations'),
+        Section(name='PULSO Track'),
 
         Page('menu_pages/dashboard.py', 'Dashboard', '📊', in_section=True),
         Page('menu_pages/geo.py', 'Geomapping', '🗺️'),
 
-        Section(name='Smart Predict'),
+        Section(name='PULSO Predict'),
 
         Page('menu_pages/predict_disease.py', 'Disease Predict', '📊'),
         Page('menu_pages/forecast.py', 'Forecast', '📉'),
         Page('menu_pages/simulate.py', 'Simulation', '🖥️'),
 
-        Section(name='Smart Prevent'),
+        Section(name='PULSO Prevent'),
 
         Page('menu_pages/sms.py', 'SMS', '📶'),
         Page('menu_pages/post.py', 'Announcements', '📲'),
@@ -120,7 +119,7 @@ show_pages(
 
 
 # Information about the app
-st.write('Welcome to PULSO, a web application to be used by government health offices that utilizes data science to monitor and predict their constituent’s health data.')
+st.write('PULSO is a web application to be used by government health offices that utilizes data science to monitor and predict their constituent’s health data.')
 col1, col2 = st.columns(2)
 with col1:
     with st.expander(label='HOW DOES PULSO WORK', expanded=False):
@@ -137,9 +136,9 @@ st.caption('IMPACT BY NUMBERS')
 col1, col2, col3 = st.columns(3)
 row1= [col1, col2, col3]
 homepage_impact = {
-    0 : ['Updated EMRs', '2748 🧑‍🎓', 1406],
-    1 : ['Lorem Ipsum', '376 🫂', 8],
-    2 : ['Active Health Facilities', '49 💙', 16]
+    0 : ['Updated EMRs', '2748', 1406],
+    1 : ['Lorem Ipsum', '376', 8],
+    2 : ['Active Health Facilities', '49', 16]
 
 }
 for ind, col in enumerate(row1):
