@@ -52,5 +52,5 @@ dependencies:
     - st-pages
     - streamlit-image-select
     - requests
-    - openai
+    - openai==0.28
     - prophet

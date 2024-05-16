@@ -3,6 +3,7 @@ import geopandas as gpd
 import pandas as pd
 import numpy as np
 import leafmap.foliumap as leafmap
+from streamlit_gsheets import GSheetsConnection
 import requests
 
 # Page config
@@ -36,23 +37,17 @@ gdf, gdf_barangay_filtered = load_geospatial(shp_location)
 # Specific municipality
 st.session_state['municipality'] = 'Lingayen'
 municipality_gdf = gdf[gdf['MUNICITY'] == st.session_state.municipality]
-
-# Display boundary
 centroid = municipality_gdf.geometry.centroid.iloc[0]
-m = leafmap.Map(center=[centroid.y, centroid.x], zoom=12)
 
+# Map 1 - add facilities
+m_1 = leafmap.Map(center=[centroid.y, centroid.x], zoom=12)
+m_1.add_gdf(gdf_barangay_filtered, layer_name='Municipality Border')
 
-###################
-
-# Add the municipality boundaries to the map
-m.add_gdf(gdf_barangay_filtered, layer_name='Municipality Border')
-
-# Add facilities
 facilities = pd.read_csv('datasets/pangasinan.csv')
 filtered_facilities = facilities[facilities['City/Municipality Name'] == 'LINGAYEN (CAPITAL)']
 filtered_facilities = filtered_facilities.dropna(subset=['Latitude', 'Longitude'])
 
-m.add_points_from_xy(
+m_1.add_points_from_xy(
     filtered_facilities,
     x="Longitude",
     y="Latitude",
@@ -64,7 +59,10 @@ m.add_points_from_xy(
 
 ###################
 
-# Add heat index
+# Map 2 - heat index
+m_2 = leafmap.Map(center=[centroid.y, centroid.x], zoom=12)
+m_2.add_gdf(gdf_barangay_filtered, layer_name='Municipality Border')
+
 @st.cache_data
 def generate_heat_index_df():
     latitude_lst = []
@@ -99,7 +97,7 @@ def generate_heat_index_df():
 
     return heat_index_df
 
-m.add_heatmap(
+m_2.add_heatmap(
     generate_heat_index_df(),
     latitude='Latitude',
     longitude='Longitude',
@@ -110,21 +108,64 @@ m.add_heatmap(
 
 #####
 
-
-# Add the choropleth cases layer
-m_2 = leafmap.Map(center=[centroid.y, centroid.x], zoom=12)
-colors = {'disease_a':'Greens', 'disease_b':'Oranges', 'disease_c':'Reds'}
-for col,label in {'disease_a':'Disease A', 'disease_b':'Disease B', 'disease_c':'Disease C'}.items():
-    m_2.add_data(
+# Maps 3-5 - chloropleth diseases
+colors = ['Greens','Oranges','Reds']
+map_title = ['Disease A','Disease B','Disease C']
+columns = ['disease_a', 'disease_b', 'disease_c']
+m_3 = leafmap.Map(center=[centroid.y, centroid.x], zoom=12)
+m_4 = leafmap.Map(center=[centroid.y, centroid.x], zoom=12)
+m_5 = leafmap.Map(center=[centroid.y, centroid.x], zoom=12)
+for ind,m in enumerate([m_3, m_4, m_5]):
+    m.add_gdf(gdf_barangay_filtered, layer_name='Municipality Border')
+    m.add_data(
         gdf_barangay_filtered,
-        column=col, 
-        legend_title='Disease A Chloropleth',
-        cmap=colors[col],
+        column=columns[ind], 
+        legend_title=f'{map_title[ind]} Chloropleth',
+        cmap=colors[ind],
         scheme='Quantiles', 
-        k=8,
+        k=5,
         legend_position='bottomright',
-        layer_name=label
+        layer_name=map_title[ind]
     )
 
-m.to_streamlit(height=700)
-m_2.to_streamlit(height=700)
+# Map 6 - hospital beds
+pangasinan = pd.read_csv('datasets\pangasinan.csv')
+conn = st.connection("beds", type=GSheetsConnection) # Google Sheets connection
+sql = 'SELECT * FROM Sheet1;'
+beds = conn.query(sql=sql, ttl=0)
+beds_with_location = beds.merge(pangasinan, on='Facility Name')
+
+m_6 = leafmap.Map(center=[centroid.y, centroid.x], zoom=12)
+m_6.add_gdf(gdf_barangay_filtered, layer_name='Municipality Border')
+
+m_6.add_heatmap(
+    beds_with_location,
+    latitude='Latitude',
+    longitude='Longitude',
+    value='Capacity Rate',
+    name='Hospital Beds',
+    radius=20
+)
+
+# Tabs
+tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs([
+    'Health Facilities',
+    'Heat Index',
+    'Disease A Chloropleth',
+    'Disease B Chloropleth',
+    'Disease C Chloropleth',
+    'Hospital Beds'
+])
+
+with tab1:
+    m_1.to_streamlit(height=700)
+with tab2:
+    m_2.to_streamlit(height=700)
+with tab3:
+    m_3.to_streamlit(height=700)
+with tab4:
+    m_4.to_streamlit(height=700)
+with tab5:
+    m_5.to_streamlit(height=700)
+with tab6:
+    m_6.to_streamlit(height=700)

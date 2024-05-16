@@ -5,6 +5,7 @@ import pandas as pd
 import numpy as np
 import openai
 import random
+import base64
 
 # Page config
 st.set_page_config(page_title='Dashboard', page_icon='📊', layout="centered", initial_sidebar_state="auto", menu_items=None)
@@ -49,7 +50,7 @@ def generate_recommendations():
     return recommendations
 
 with st.container(border=True):
-    st.caption('✨ PULSO Analyze')
+    st.caption('✨ AgapAI')
     st.write('Utilize Generative AI to generate actionable next steps for your municipality\'s health data.')
     st.button('Generate Analysis', type='primary', on_click=update_generate_button)
 
@@ -115,6 +116,20 @@ with col2:
 st.write('\n')
 st.caption('NON-COMMUNICABLE DISEASE SITUATIONER')
 
+file_ = open("images/Lingayen_MRS.png", "rb")
+contents = file_.read()
+data_url = base64.b64encode(contents).decode("utf-8")
+file_.close()
+
+# Display the GIF in the center with altered size
+st.markdown(
+    f'''
+    <div style="display: flex; justify-content: center;">
+        <img src="data:image/gif;base64,{data_url}" alt="SIRV Simulation" style="width: 130%; height: auto;">
+    </div>
+    ''',
+    unsafe_allow_html=True,
+)
 
 
 # Row 4
