@@ -51,7 +51,6 @@ dependencies:
     - streamlit-extras 
     - st-pages
     - streamlit-image-select
-    - streamlit-option-menu==0.3.6
-
-    # Added new for geospatial
     - requests
+    - openai
+    - prophet
