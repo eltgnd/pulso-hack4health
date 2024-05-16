@@ -5,9 +5,16 @@ import pandas as pd
 from prophet import Prophet
 import matplotlib.pyplot as plt
 
-st.title('Communicable Disease Forecast 🦠')
+# Page config
+st.set_page_config(page_title='Forecast', page_icon='📉', layout="centered", initial_sidebar_state="auto", menu_items=None)
 
-tab1, tab2 = st.tabs(["Measles ❤️‍🩹", "Pertussis 🤒"])
+
+st.title('Communicable Disease Forecast 📉')
+with st.expander('❤️ AT A GLANCE'):
+    st.write("""PULSO Predict also includes time series forecasting capabilities to predict communicable disease trends such as measles and pertussis, enabling proactive resource allocation and outbreak response. With Disease Predict, stay ahead of disease trends and take steps to safeguard public health.""")
+st.write('\n')
+
+tab1, tab2 = st.tabs(["Measles", "Pertussis"])
 
 # Tab 1: Measles
 with tab1:

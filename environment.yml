@@ -54,3 +54,4 @@ dependencies:
     - requests
     - openai==0.28
     - prophet
+    - agentpy

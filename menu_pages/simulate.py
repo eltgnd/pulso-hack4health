@@ -7,8 +7,14 @@ import streamlit as st
 import base64
 import os
 
-matplotlib.rcParams['animation.embed_limit'] = 2**128
+# Page config
+st.set_page_config(page_title='Simulation', page_icon='🖥️', layout="centered", initial_sidebar_state="auto", menu_items=None)
 
+with st.expander('❤️ AT A GLANCE'):
+    st.write("""Welcome to the Simulation page of PULSO, your dynamic tool for epidemiological modeling and scenario analysis. Integrated within the app for seamless access, this feature harnesses sophisticated epidemiology models like FASSSTER and SIR-V. Whether preparing for epidemics or pandemics, healthcare professionals can conduct rapid response planning and scenario analysis to effectively manage infectious diseases and mitigate their impact on public health. Stay prepared with Simulation, your key to effective disease management strategies.""")
+st.write('\n')
+
+matplotlib.rcParams['animation.embed_limit'] = 2**128
 
 # Streamlit form for parameters
 st.title("Infection Simulation Model 🧬")

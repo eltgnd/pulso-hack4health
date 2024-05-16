@@ -3,7 +3,14 @@ import pickle
 import streamlit as st
 import pandas as pd
 
+# Page config
+st.set_page_config(page_title='Disease Predict', page_icon='🧬', layout="centered", initial_sidebar_state="auto", menu_items=None)
+
+
 st.title('Disease Prediction System 🧬')
+with st.expander('❤️ AT A GLANCE'):
+    st.write("""Welcome to the Disease Predict page of PULSO, your comprehensive tool for disease prediction and forecasting. Utilizing machine learning models, this feature empowers healthcare professionals to identify risks of non-communicable diseases like diabetes, Parkinson’s, and heart disease.""")
+st.write('\n')
 
 tab1, tab2, tab3 = st.tabs(["Diabetes 🧪", "Heart Disease 🔬", "Parkinson's Disease 🙍"])
 

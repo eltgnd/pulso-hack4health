@@ -21,8 +21,9 @@ def generate_sms_message(age_group, message_type):
 
 # Title
 st.title('📶 PULSO SMS')
-st.write('Lorem ipsum')
-st.divider()
+with st.expander('❤️ AT A GLANCE'):
+    st.write("""Welcome to the SMS Notifications page of PULSO, your direct line of communication for timely health updates. With AI-generated messaging tailored to different age groups and specific health records, our platform delivers targeted alerts, reminders for checkups, and emergency notifications to keep the community informed and proactive about their health. Stay connected and informed wherever you are, ensuring prompt action and preventive measures for better health outcomes.""")
+st.write('\n')
 
 # Demographic demo
 with st.container(border=True):
