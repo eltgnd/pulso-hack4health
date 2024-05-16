@@ -1,6 +1,7 @@
 import streamlit as st
 import geopandas as gpd
 import pandas as pd
+import numpy as np
 import leafmap.foliumap as leafmap
 import requests
 
@@ -16,10 +17,21 @@ def load_geospatial(shp_location):
     latitude, longitude = float(st.session_state['latitude']), float(st.session_state['longitude']) 
     gdf = gpd.read_file(shp_location)
     gdf.rename(columns={'ADM3_EN': 'MUNICITY', 'ADM2_EN': 'PROVINCE', 'ADM1_EN':'REGION'}, inplace=True)
-    return gdf
+
+    gdf_barangay = gpd.read_file('datasets/phmap/phl_admbnda_adm4_psa_namria_20231106.shp')
+    gdf_barangay_filtered = gdf_barangay[gdf_barangay['ADM3_EN'] == 'Lingayen (Capital)']
+
+    np.random.seed(42)
+    gdf_barangay_filtered['disease_a'] = np.random.rand(len(gdf_barangay_filtered))
+    np.random.seed(13)
+    gdf_barangay_filtered['disease_b'] = np.random.rand(len(gdf_barangay_filtered))
+    np.random.seed(77)
+    gdf_barangay_filtered['disease_c'] = np.random.rand(len(gdf_barangay_filtered))
+
+    return gdf, gdf_barangay_filtered
 
 shp_location = 'datasets/phl_adminboundaries_candidate_adm3/phl_admbnda_adm3_psa_namria_20200529.shp'
-gdf = load_geospatial(shp_location)
+gdf, gdf_barangay_filtered = load_geospatial(shp_location)
 
 # Specific municipality
 st.session_state['municipality'] = 'Lingayen'
@@ -33,8 +45,9 @@ m = leafmap.Map(center=[centroid.y, centroid.x], zoom=12)
 ###################
 
 # Add the municipality boundaries to the map
-m.add_gdf(municipality_gdf, layer_name='Municipality Border')
+m.add_gdf(gdf_barangay_filtered, layer_name='Municipality Border')
 
+# Add facilities
 facilities = pd.read_csv('datasets/pangasinan.csv')
 filtered_facilities = facilities[facilities['City/Municipality Name'] == 'LINGAYEN (CAPITAL)']
 filtered_facilities = filtered_facilities.dropna(subset=['Latitude', 'Longitude'])
@@ -86,7 +99,6 @@ def generate_heat_index_df():
 
     return heat_index_df
 
-# Add the heatmap layer to the map
 m.add_heatmap(
     generate_heat_index_df(),
     latitude='Latitude',
@@ -96,25 +108,23 @@ m.add_heatmap(
     radius=40
 )
 
-# Display
+#####
+
+
+# Add the choropleth cases layer
+m_2 = leafmap.Map(center=[centroid.y, centroid.x], zoom=12)
+colors = {'disease_a':'Greens', 'disease_b':'Oranges', 'disease_c':'Reds'}
+for col,label in {'disease_a':'Disease A', 'disease_b':'Disease B', 'disease_c':'Disease C'}.items():
+    m_2.add_data(
+        gdf_barangay_filtered,
+        column=col, 
+        legend_title='Disease A Chloropleth',
+        cmap=colors[col],
+        scheme='Quantiles', 
+        k=8,
+        legend_position='bottomright',
+        layer_name=label
+    )
+
 m.to_streamlit(height=700)
-
-
-# col1, col2 = st.columns([4, 1])
-# options = list(leafmap.basemaps.keys())
-# index = options.index("OpenTopoMap")
-
-# with col2:
-#     basemap = st.selectbox("Select a basemap:", options, index)
-
-
-# with col1:
-#     # Longitude and latitude of municipality
-#     latitude, longitude = float(st.session_state['latitude']), float(st.session_state['longitude']) 
-
-#     m = leafmap.Map(
-#         locate_control=True, latlon_control=True, draw_export=True, minimap_control=True,
-#         center=[latitude, longitude], zoom=12
-#     )
-#     m.add_basemap(basemap)
-#     m.to_streamlit(height=700)
+m_2.to_streamlit(height=700)
