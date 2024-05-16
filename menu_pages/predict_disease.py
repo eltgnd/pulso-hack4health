@@ -1,6 +1,6 @@
 import streamlit as st
 
-tab1, tab2, tab3 = st.tabs(["Cat", "Dog", "Owl"])
+tab1, tab2, tab3 = st.tabs(["Diabetes", "Heart Disease", "Parkinson's Disease"])
 
 with tab1:
    st.header("A cat")

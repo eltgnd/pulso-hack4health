@@ -4,10 +4,7 @@ import streamlit as st
 import pandas as pd
 
 working_dir = os.path.dirname(os.path.abspath(__file__))
-# Construct the full path to the model file using os.path.join
 model_path = os.path.join(working_dir, '..', 'saved_models', 'diabetes_model.sav')
-
-# Load the model
 diabetes_model = pickle.load(open(model_path, 'rb'))
 
 
@@ -18,28 +15,28 @@ st.title('Diabetes Prediction System 🧬')
 col1, col2, col3 = st.columns(3)
 
 with col1:
-    Pregnancies = st.text_input('Number of Pregnancies')
+    Pregnancies = st.text_input('Parameter A') # Number of Pregnancies
 
 with col2:
-    Glucose = st.text_input('Glucose Level')
+    Glucose = st.text_input('Parameter B') #Glucose Level
 
 with col3:
-    BloodPressure = st.text_input('Blood Pressure value')
+    BloodPressure = st.text_input('Parameter C') # Blood Pressure value
 
 with col1:
-    SkinThickness = st.text_input('Skin Thickness value')
+    SkinThickness = st.text_input('Parameter D') # Skin Thickness value
 
 with col2:
-    Insulin = st.text_input('Insulin Level')
+    Insulin = st.text_input('Parameter E') # Insulin Level
 
 with col3:
-    BMI = st.text_input('BMI value')
+    BMI = st.text_input('Parameter F') # BMI value
 
 with col1:
-    DiabetesPedigreeFunction = st.text_input('Diabetes Pedigree Function value')
+    DiabetesPedigreeFunction = st.text_input('Parameter G') # Diabetes Pedigree Function value'
 
 with col2:
-    Age = st.text_input('Age of the Person')
+    Age = st.text_input('Parameter H') # Age of the Person
 
 # code for Prediction
 diab_diagnosis = ''

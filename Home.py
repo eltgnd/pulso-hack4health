@@ -106,9 +106,7 @@ show_pages(
 
         Section(name='Smart Predict'),
 
-        Page('menu_pages/diabetes.py', 'Diabetes', '💉'),
-        Page('menu_pages/heart_disease.py', 'Heart Disease', '🩵'),
-        Page('menu_pages/parkinson.py', 'Parkinson\'s Disease', '🔬'),
+        Page('menu_pages/predict_disease.py', 'Disease Predict', '📊'),
         Page('menu_pages/simulate.py', 'Simulation', '🖥️'),
 
         Section(name='Smart Prevent'),
