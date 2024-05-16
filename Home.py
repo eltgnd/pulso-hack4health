@@ -107,6 +107,7 @@ show_pages(
         Section(name='Smart Predict'),
 
         Page('menu_pages/predict_disease.py', 'Disease Predict', '📊'),
+        Page('menu_pages/forecast.py', 'Forecast', '📉'),
         Page('menu_pages/simulate.py', 'Simulation', '🖥️'),
 
         Section(name='Smart Prevent'),
