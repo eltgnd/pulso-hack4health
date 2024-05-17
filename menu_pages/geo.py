@@ -1,27 +1,16 @@
 import streamlit as st
 import geopandas as gpd
 import pandas as pd
+from streamlit_gsheets import GSheetsConnection
 import numpy as np
 import leafmap.foliumap as leafmap
-from streamlit_gsheets import GSheetsConnection
 import requests
-
 
 # Page config
 st.set_page_config(page_title='Geo', page_icon='🗺️', layout="wide", initial_sidebar_state="auto", menu_items=None)
 
 # Title
 st.title('🗺️ Geomapping')
-
-# Tabs
-tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs([
-    'Health Facilities',
-    'Heat Index',
-    'Disease A Chloropleth',
-    'Disease B Chloropleth',
-    'Disease C Chloropleth',
-    'Hospital Beds'
-])
 
 # Load geospatial data
 @st.cache_data
@@ -48,143 +37,126 @@ gdf, gdf_barangay_filtered = load_geospatial(shp_location)
 # Specific municipality
 st.session_state['municipality'] = 'Lingayen'
 municipality_gdf = gdf[gdf['MUNICITY'] == st.session_state.municipality]
+
+# Display boundary
 centroid = municipality_gdf.geometry.centroid.iloc[0]
+m = leafmap.Map(center=[centroid.y, centroid.x], zoom=12)
 
-# Map 1 - add facilities
-with tab1:
-    m_1 = leafmap.Map(center=[centroid.y, centroid.x], zoom=12)
-    m_1.add_gdf(gdf_barangay_filtered, layer_name='Municipality Border')
 
-    facilities = pd.read_csv('datasets/pangasinan.csv')
-    filtered_facilities = facilities[facilities['City/Municipality Name'] == 'LINGAYEN (CAPITAL)']
-    filtered_facilities = filtered_facilities.dropna(subset=['Latitude', 'Longitude'])
+###################
 
-    m_1.add_points_from_xy(
-        filtered_facilities,
-        x="Longitude",
-        y="Latitude",
-        icon_names=["gear", "map", "leaf", "globe"],
-        spin=True,
-        add_legend=True,
-        layer_name='Health Facilities'
+# Add the municipality boundaries to the map
+m.add_gdf(gdf_barangay_filtered, layer_name='Municipality Border')
+
+# Add facilities
+facilities = pd.read_csv('datasets/pangasinan.csv')
+filtered_facilities = facilities[facilities['City/Municipality Name'] == 'LINGAYEN (CAPITAL)']
+filtered_facilities = filtered_facilities.dropna(subset=['Latitude', 'Longitude'])
+
+m.add_points_from_xy(
+    filtered_facilities,
+    x="Longitude",
+    y="Latitude",
+    icon_names=["gear", "map", "leaf", "globe"],
+    spin=True,
+    add_legend=True,
+    layer_name='Health Facilities'
+)
+
+###################
+
+# Add heat index
+@st.cache_data
+def generate_heat_index_df():
+    latitude_lst = []
+    longitude_lst = []
+    heat_index_lst = []
+
+    api_key = st.secrets['openweathermap_api']
+    facilities_list = filtered_facilities['Facility Code'].tolist()
+
+    for f in facilities_list:
+        f_long = filtered_facilities.loc[filtered_facilities['Facility Code'] == f, 'Longitude'].values[0]
+        f_lat = filtered_facilities.loc[filtered_facilities['Facility Code'] == f, 'Latitude'].values[0]
+        url = f'http://api.openweathermap.org/data/2.5/weather?lat={f_lat}&lon={f_long}&appid={api_key}&units=metric'
+
+        # Fetch the current weather data
+        response = requests.get(url)
+        data = response.json()
+        # Extract necessary information
+        heat_latitude = data['coord']['lat']
+        heat_longitude = data['coord']['lon']
+        heat_index = data['main']['feels_like']  # Using 'feels_like' as the heat index
+        # Add to lst
+        latitude_lst.append(heat_latitude)
+        longitude_lst.append(heat_longitude)
+        heat_index_lst.append(heat_index)
+    
+    heat_index_df = pd.DataFrame({
+    'Latitude': latitude_lst,
+    'Longitude': longitude_lst,
+    'Heat_Index': heat_index_lst
+    })
+
+    return heat_index_df
+
+m.add_heatmap(
+    generate_heat_index_df(),
+    latitude='Latitude',
+    longitude='Longitude',
+    value='Heat_Index',
+    name='Heat Index',
+    radius=40
+)
+
+#####
+
+
+# Add the choropleth cases layer
+m_2 = leafmap.Map(center=[centroid.y, centroid.x], zoom=12)
+colors = {'disease_a':'Greens', 'disease_b':'Oranges', 'disease_c':'Reds'}
+for col,label in {'disease_a':'Disease A', 'disease_b':'Disease B', 'disease_c':'Disease C'}.items():
+    m_2.add_data(
+        gdf_barangay_filtered,
+        column=col, 
+        legend_title='Disease A Chloropleth',
+        cmap=colors[col],
+        scheme='Quantiles', 
+        k=8,
+        legend_position='bottomright',
+        layer_name=label
     )
-    m_1.to_streamlit(height=700)
 
-# Map 2 - heat index
-with tab2:
-    m_2 = leafmap.Map(center=[centroid.y, centroid.x], zoom=12)
-    m_2.add_gdf(gdf_barangay_filtered, layer_name='Municipality Border')
 
-    @st.cache_data
-    def generate_heat_index_df():
-        latitude_lst = []
-        longitude_lst = []
-        heat_index_lst = []
+# Add hospital beds
+m_3 = leafmap.Map(center=[centroid.y, centroid.x], zoom=12)
+m_3.add_gdf(gdf_barangay_filtered, layer_name='Municipality Border')
 
-        api_key = st.secrets['openweathermap_api']
-        facilities_list = filtered_facilities['Facility Code'].tolist()
+pangasinan = pd.read_csv('datasets\pangasinan.csv')
+conn = st.connection("beds", type=GSheetsConnection) # Google Sheets connection
+sql = 'SELECT * FROM Sheet1;'
+beds = conn.query(sql=sql, ttl=0)
+beds_with_location = beds.merge(pangasinan, on='Facility Name')
+beds_with_location = beds_with_location.dropna(subset=['Latitude', 'Longitude'])
 
-        for f in facilities_list:
-            f_long = filtered_facilities.loc[filtered_facilities['Facility Code'] == f, 'Longitude'].values[0]
-            f_lat = filtered_facilities.loc[filtered_facilities['Facility Code'] == f, 'Latitude'].values[0]
-            url = f'http://api.openweathermap.org/data/2.5/weather?lat={f_lat}&lon={f_long}&appid={api_key}&units=metric'
+m_3.add_heatmap(
+    beds_with_location,
+    latitude='Latitude',
+    longitude='Longitude',
+    value='Capacity Rate',
+    layer_name='Hospital Beds',
+    radius=20,
+)
 
-            # Fetch the current weather data
-            response = requests.get(url)
-            data = response.json()
-            # Extract necessary information
-            heat_latitude = data['coord']['lat']
-            heat_longitude = data['coord']['lon']
-            heat_index = data['main']['feels_like']  # Using 'feels_like' as the heat index
-            # Add to lst
-            latitude_lst.append(heat_latitude)
-            longitude_lst.append(heat_longitude)
-            heat_index_lst.append(heat_index)
-        
-        heat_index_df = pd.DataFrame({
-        'Latitude': latitude_lst,
-        'Longitude': longitude_lst,
-        'Heat_Index': heat_index_lst
-        })
-
-        return heat_index_df
-
-    m_2.add_heatmap(
-        generate_heat_index_df(),
-        latitude='Latitude',
-        longitude='Longitude',
-        value='Heat_Index',
-        name='Heat Index',
-        radius=40
-    )
+with st.container(border=True):
+    st.caption('GENERAL MAPPING')
+    st.write('The General Mapping container provides an overview of the municipality of Lingayen, including its boundaries and health facilities. It displays the geographic data and marks health facilities with icons, adding a visual representation of their locations within the municipality.')
+    m.to_streamlit(height=700)
+with st.container(border=True):
+    st.caption('DISEASE MAPPING')
+    st.write('The Disease Mapping container visualizes the distribution of diseases within Lingayen. It uses a choropleth map to show the prevalence of three different diseases (Disease A, Disease B, and Disease C) across various barangays.')
     m_2.to_streamlit(height=700)
-
-
-# Maps 3-5 - chloropleth diseases
-colors = ['Greens','Oranges','Reds']
-map_title = ['Disease A','Disease B','Disease C']
-columns = ['disease_a', 'disease_b', 'disease_c']
-with tab3:
-    m_3 = leafmap.Map(center=[centroid.y, centroid.x], zoom=12)
-    m_3.add_gdf(gdf_barangay_filtered, layer_name='Municipality Border')
-    m_3.add_data(
-        gdf_barangay_filtered,
-        column=columns[0], 
-        legend_title=f'{map_title[0]} Chloropleth',
-        cmap=colors[0],
-        scheme='Quantiles', 
-        k=5,
-        legend_position='bottomright',
-        layer_name=map_title[0]
-    )
+with st.container(border=True):
+    st.caption('HOSPITAL MAPPING')
+    st.write('The Hospital Mapping container focuses on the capacity of hospitals in Lingayen. It integrates data on hospital bed availability and capacity rates, displaying this information as a heatmap. ')
     m_3.to_streamlit(height=700)
-with tab4:
-    m_4 = leafmap.Map(center=[centroid.y, centroid.x], zoom=12)
-    m_4.add_gdf(gdf_barangay_filtered, layer_name='Municipality Border')
-    m_4.add_data(
-        gdf_barangay_filtered,
-        column=columns[1], 
-        legend_title=f'{map_title[1]} Chloropleth',
-        cmap=colors[1],
-        scheme='Quantiles', 
-        k=5,
-        legend_position='bottomright',
-        layer_name=map_title[1]
-    )
-    m_4.to_streamlit(height=700)
-with tab5:
-    m_5 = leafmap.Map(center=[centroid.y, centroid.x], zoom=12)
-    m_5.add_gdf(gdf_barangay_filtered, layer_name='Municipality Border')
-    m_5.add_data(
-        gdf_barangay_filtered,
-        column=columns[2], 
-        legend_title=f'{map_title[2]} Chloropleth',
-        cmap=colors[2],
-        scheme='Quantiles', 
-        k=5,
-        legend_position='bottomright',
-        layer_name=map_title[2]
-    )
-    m_5.to_streamlit(height=700)
-
-# Map 6 - hospital beds
-with tab6:
-    pangasinan = pd.read_csv('datasets\pangasinan.csv')
-    conn = st.connection("beds", type=GSheetsConnection) # Google Sheets connection
-    sql = 'SELECT * FROM Sheet1;'
-    beds = conn.query(sql=sql, ttl=0)
-    beds_with_location = beds.merge(pangasinan, on='Facility Name')
-    beds_with_location = beds_with_location.dropna(subset=['Latitude', 'Longitude'])
-
-    m_6 = leafmap.Map(center=[centroid.y, centroid.x], zoom=12)
-    m_6.add_gdf(gdf_barangay_filtered, layer_name='Municipality Border')
-
-    m_6.add_heatmap(
-        beds_with_location,
-        latitude='Latitude',
-        longitude='Longitude',
-        value='Capacity Rate',
-        name='Hospital Beds',
-        radius=20
-    )
-    m_6.to_streamlit(height=700)

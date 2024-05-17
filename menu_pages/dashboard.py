@@ -12,12 +12,8 @@ import base64
 # Page config
 st.set_page_config(page_title='Dashboard', page_icon='📊', layout="centered", initial_sidebar_state="auto", menu_items=None)
 
-# Title
-col1, col2, col3 = st.columns([0.1,0.2,7])
-with col1:
-    st.image('images/logo.png', width=30) 
-with col3:
-    st.caption('🧑‍⚕️ PULSO | Predictive Understanding for Localized Health Surveillance and Optimization')
+
+st.caption('PULSO | Predictive Understanding for Localized Health Surveillance and Optimization')
 
 # Title
 st.title('📊 PULSO Dashboard')

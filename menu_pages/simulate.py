@@ -10,28 +10,27 @@ import os
 # Page config
 st.set_page_config(page_title='Simulation', page_icon='🖥️', layout="centered", initial_sidebar_state="auto", menu_items=None)
 
+# Title
+st.title("Infection Simulation Model 🧬")
 with st.expander('❤️ AT A GLANCE'):
     st.write("""Welcome to the Simulation page of PULSO, your dynamic tool for epidemiological modeling and scenario analysis. Integrated within the app for seamless access, this feature harnesses sophisticated epidemiology models like FASSSTER and SIR-V. Whether preparing for epidemics or pandemics, healthcare professionals can conduct rapid response planning and scenario analysis to effectively manage infectious diseases and mitigate their impact on public health. Stay prepared with Simulation, your key to effective disease management strategies.""")
 st.write('\n')
 
 matplotlib.rcParams['animation.embed_limit'] = 2**128
 
-# Streamlit form for parameters
-st.title("Infection Simulation Model 🧬")
+st.caption("PARAMETERS")
+with st.form(key='parameters_form'):
+    population_density = st.slider('Population Density', 0.0, 1.0, 0.65)
+    size = st.number_input('Size', min_value=1, max_value=100, value=50)
+    steps = st.number_input('Steps', min_value=1, value=300)
+    initial_infected = st.number_input('Initial Infected', min_value=1, value=3)
+    infection_probability = st.slider('Infection Probability', 0.0, 1.0, 0.3)
+    recovery_probability = st.slider('Recovery Probability', 0.0, 1.0, 0.1)
+    resusceptibility_probability = st.slider('Resusceptibility Probability', 0.0, 1.0, 0.02)
+    vaccination_speed = st.number_input('Vaccination Speed', min_value=0, value=20)
+    vaccination_start = st.number_input('Vaccination Start', min_value=0, value=100)
 
-with st.expander("Parameters", expanded=True):
-    with st.form(key='parameters_form'):
-        population_density = st.slider('Population Density', 0.0, 1.0, 0.65)
-        size = st.number_input('Size', min_value=1, max_value=100, value=50)
-        steps = st.number_input('Steps', min_value=1, value=300)
-        initial_infected = st.number_input('Initial Infected', min_value=1, value=3)
-        infection_probability = st.slider('Infection Probability', 0.0, 1.0, 0.3)
-        recovery_probability = st.slider('Recovery Probability', 0.0, 1.0, 0.1)
-        resusceptibility_probability = st.slider('Resusceptibility Probability', 0.0, 1.0, 0.02)
-        vaccination_speed = st.number_input('Vaccination Speed', min_value=0, value=20)
-        vaccination_start = st.number_input('Vaccination Start', min_value=0, value=100)
-
-        submit_button = st.form_submit_button(label='Run Simulation')
+    submit_button = st.form_submit_button(label='Run Simulation')
 
 parameters = {
     'Population Density': population_density,
@@ -188,6 +187,7 @@ model = InfectionModel(parameters)
 if submit_button:
     with st.spinner('Simulating...'):
         results = model.run()
+    st.toast('Simulation complete!', icon='✅')
     fig1, ax = plt.subplots()
     virus_lineplot(results.variables.InfectionModel, ax)
     
@@ -247,7 +247,7 @@ else:
         st.markdown(
             f'''
             <div style="display: flex; justify-content: center;">
-                <img src="data:image/gif;base64,{data_url}" alt="SIRV Simulation" style="width: 110%; height: auto;">
+                <img src="data:image/gif;base64,{data_url}" alt="SIRV Simulation" style="width: 120%; height: auto;">
             </div>
             ''',
             unsafe_allow_html=True,

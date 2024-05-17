@@ -1,6 +1,6 @@
 import streamlit as st
 
-st.title('💡')
+st.title('💡 ABOUT')
 
 st.markdown("""The PULSO web app was developed by sophomores from Ateneo de Manila University.
                 

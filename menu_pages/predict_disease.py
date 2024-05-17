@@ -10,6 +10,7 @@ st.set_page_config(page_title='Disease Predict', page_icon='🧬', layout="cente
 st.title('Disease Prediction System 🧬')
 with st.expander('❤️ AT A GLANCE'):
     st.write("""Welcome to the Disease Predict page of PULSO, your comprehensive tool for disease prediction and forecasting. Utilizing machine learning models, this feature empowers healthcare professionals to identify risks of non-communicable diseases like diabetes, Parkinson’s, and heart disease.""")
+    st.write('For demonstration, the machine learning model used was based on https://github.com/siddhardhan23/multiple-disease-prediction-streamlit-app with an accuracy of 75% to 90%.')
 st.write('\n')
 
 tab1, tab2, tab3 = st.tabs(["Diabetes 🧪", "Heart Disease 🔬", "Parkinson's Disease 🙍"])
