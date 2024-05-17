@@ -32,7 +32,6 @@ dependencies:
   - google-auth=2.29 # conda. for accessing a private GSheets file in a Streamlit web app.
   - ipykernel=6.29 # conda. so that the environment can be used as a jupyter kernel and vscode kernel
   - pillow=10.0 # conda. for displaying images.
-  - beautifulsoup4=4.12
 
   # Additional geospatial packages
   - leafmap
